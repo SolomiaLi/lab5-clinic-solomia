@@ -1,0 +1,14 @@
+<h1>Список медичних записів</h1>
+<a href="{% url 'medical-record-add' %}">Додати запис</a>
+<table border="1">
+<tr><th>ID</th><th>Пацієнт ID</th><th>Хвороба ID</th><th>Лаб. тест</th><th>Деталі</th></tr>
+{% for record in records %}
+<tr>
+<td>{{ record.id }}</td>
+<td>{{ record.ID_patients }}</td>
+<td>{{ record.ID_disease }}</td>
+<td>{{ record.lab_test }}</td>
+<td><a href="{% url 'medical-record-detail' record.id %}">Деталі</a></td>
+</tr>
+{% endfor %}
+</table>

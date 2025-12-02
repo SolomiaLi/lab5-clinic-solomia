@@ -1,0 +1,17 @@
+<h1>Деталі пацієнта {{ patient.first_name }} {{ patient.last_name }}</h1>
+<p>ID: {{ patient.id }}</p>
+<p>Дата народження: {{ patient.date_of_birth }}</p>
+<p>Стать: {{ patient.gender }}</p>
+<p>Телефон: {{ patient.phone }}</p>
+<p>Місто: {{ patient.city }}</p>
+<p>Вулиця: {{ patient.street }}</p>
+<p>Будинок: {{ patient.house_number }}</p>
+
+<a href="{% url 'patient-edit' patient.id %}">Редагувати</a>
+
+<form action="{% url 'patient-delete' patient.id %}" method="post">
+  {% csrf_token %}
+  <button type="submit">Видалити</button>
+</form>
+
+<a href="{% url 'patients-list' %}">Повернутись до списку</a>

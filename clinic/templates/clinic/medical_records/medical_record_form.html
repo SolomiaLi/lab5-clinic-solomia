@@ -1,0 +1,12 @@
+<h1>{% if action == 'add' %}Додати запис{% else %}Редагувати запис{% endif %}</h1>
+{% if error %}<p style="color:red;">{{ error }}</p>{% endif %}
+<form method="post">
+{% csrf_token %}
+<label>Пацієнт ID: <input type="number" name="ID_patients" value="{{ record.ID_patients|default:'' }}"></label><br>
+<label>Хвороба ID: <input type="number" name="ID_disease" value="{{ record.ID_disease|default:'' }}"></label><br>
+<label>Лаб. тест: <input type="text" name="lab_test" value="{{ record.lab_test|default:'' }}"></label><br>
+<label>Рівень хвороби: <input type="number" name="level_of_disease" value="{{ record.level_of_disease|default:'' }}"></label><br>
+<label>Хронічне: <input type="checkbox" name="chronic" {% if record.chronic %}checked{% endif %}></label><br>
+<button type="submit">{% if action == 'add' %}Додати{% else %}Зберегти{% endif %}</button>
+</form>
+<a href="{% url 'medical-records-list' %}">Повернутись до списку</a>

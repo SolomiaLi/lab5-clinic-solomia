@@ -1,0 +1,15 @@
+<h1>Деталі медичного запису {{ record.id }}</h1>
+<p>Пацієнт ID: {{ record.ID_patients }}</p>
+<p>Хвороба ID: {{ record.ID_disease }}</p>
+<p>Лаб. тест: {{ record.lab_test }}</p>
+<p>Рівень хвороби: {{ record.level_of_disease }}</p>
+<p>Хронічне: {{ record.chronic }}</p>
+
+<a href="{% url 'medical-record-edit' record.id %}">Редагувати</a>
+
+<form action="{% url 'medical-record-delete' record.id %}" method="post">
+{% csrf_token %}
+<button type="submit">Видалити</button>
+</form>
+
+<a href="{% url 'medical-records-list' %}">Повернутись до списку</a>

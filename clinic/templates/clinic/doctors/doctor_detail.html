@@ -1,0 +1,12 @@
+<h1>Деталі лікаря {{ doctor.first_name }} {{ doctor.last_name }}</h1>
+<p>ID: {{ doctor.id }}</p>
+<p>Телефон: {{ doctor.phone_number }}</p>
+
+<a href="{% url 'doctor-edit' doctor.id %}">Редагувати</a>
+
+<form action="{% url 'doctor-delete' doctor.id %}" method="post">
+{% csrf_token %}
+<button type="submit">Видалити</button>
+</form>
+
+<a href="{% url 'doctors-list' %}">Повернутись до списку</a>

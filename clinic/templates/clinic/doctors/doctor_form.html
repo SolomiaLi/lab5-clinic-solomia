@@ -1,0 +1,10 @@
+<h1>{% if action == 'add' %}Додати лікаря{% else %}Редагувати лікаря{% endif %}</h1>
+{% if error %}<p style="color:red;">{{ error }}</p>{% endif %}
+<form method="post">
+{% csrf_token %}
+<label>Ім'я: <input type="text" name="first_name" value="{{ doctor.first_name|default:'' }}"></label><br>
+<label>Прізвище: <input type="text" name="last_name" value="{{ doctor.last_name|default:'' }}"></label><br>
+<label>Телефон: <input type="text" name="phone_number" value="{{ doctor.phone_number|default:'' }}"></label><br>
+<button type="submit">{% if action == 'add' %}Додати{% else %}Зберегти{% endif %}</button>
+</form>
+<a href="{% url 'doctors-list' %}">Повернутись до списку</a>

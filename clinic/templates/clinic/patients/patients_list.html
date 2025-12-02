@@ -1,0 +1,15 @@
+<h1>Список пацієнтів</h1>
+<a href="{% url 'patient-add' %}">Додати нового пацієнта</a>
+<table border="1">
+  <tr>
+    <th>ID</th><th>Ім'я</th><th>Прізвище</th><th>Деталі</th>
+  </tr>
+  {% for patient in patients %}
+  <tr>
+    <td>{{ patient.id }}</td>
+    <td>{{ patient.first_name }}</td>
+    <td>{{ patient.last_name }}</td>
+    <td><a href="{% url 'patient-detail' patient.id %}">Деталі</a></td>
+  </tr>
+  {% endfor %}
+</table>
