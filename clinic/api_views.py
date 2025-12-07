@@ -1,93 +1,90 @@
 import requests
 
-BASE_URL = "http://127.0.0.1:7777"
+BASE_URL = "http://127.0.0.1:8000/api"   # твій сервер
 
-API_PREFIX = "/api"
 
-AUTH = ("Solomia", "Q09liashchuk")
-
-def print_response(resp):
-    print(f"Status: {resp.status_code}")
+def print_response(title, resp):
+    print("=" * 40)
+    print(title)
+    print("Status:", resp.status_code)
     try:
-        print("Body:", resp.json())
+        print("JSON:", resp.json())
     except Exception:
         print("Text:", resp.text)
-    print("-" * 40)
 
 
-# 1. GET LIST
-def get_clients_list():
-    print("\n--- 1. ОТРИМАННЯ СПИСКУ (GET LIST) ---")
-    url = f"{BASE_URL}{API_PREFIX}/clients/"
-    resp = requests.get(url, auth=AUTH)
-    print_response(resp)
+def get_patients_list():
+    url = f"{BASE_URL}/patients/"
+    resp = requests.get(url)
+    print_response("GET patients list", resp)
 
 
-# 2. CREATE
-def create_client():
-    print("\n--- 2. СТВОРЕННЯ (CREATE) ---")
-    url = f"{BASE_URL}{API_PREFIX}/clients/"
+def get_patient_by_id(patient_id: int):
+    url = f"{BASE_URL}/patients/{patient_id}/"
+    resp = requests.get(url)
+    print_response(f"GET patient id={patient_id}", resp)
+
+
+def create_patient():
+    url = f"{BASE_URL}/patients/"
     data = {
-        "first_name": "TestBot",
-        "last_name": "API_User",
-        "email": "bot@test.com",
-        "phone": "+380991234567"
+        "first_name": "ApiClient",
+        "last_name": "Test",
+        "date_of_birth": "1995-04-12",   # формат YYYY-MM-DD
+        "gender": "Чоловіча",
+        "phone": "501234512",
+        "city": "Київ",
+        "street": "Хрещатик",
+        "house_number": "10",
     }
-
-    resp = requests.post(url, json=data, auth=AUTH)
-    print_response(resp)
-
-    if resp.status_code in [200, 201]:
-        return resp.json().get('id')
+    resp = requests.post(url, json=data)
+    print_response("CREATE patient", resp)
+    if resp.status_code in (200, 201):
+        try:
+            return resp.json().get("id")
+        except Exception:
+            return None
     return None
 
 
-# 3. GET BY ID
-def get_client_by_id(client_id):
-    print(f"\n--- 3. ОТРИМАННЯ ПО ID (GET ID={client_id}) ---")
-    url = f"{BASE_URL}{API_PREFIX}/clients/{client_id}/"
-    resp = requests.get(url, auth=AUTH)
-    print_response(resp)
-
-
-# 4. UPDATE
-def update_client(client_id):
-    print(f"\n--- 4. ОНОВЛЕННЯ (UPDATE ID={client_id}) ---")
-    url = f"{BASE_URL}{API_PREFIX}/clients/{client_id}/"
-
+def update_patient(patient_id: int):
+    url = f"{BASE_URL}/patients/{patient_id}/"
     data = {
-        "first_name": "UpdatedName",
-        "last_name": "UpdatedSurname",
-        "phone": "+380000000000",
-        "email": "update@test.com"
+        "first_name": "ApiClientUpdated",
+        "last_name": "User",
+        "date_of_birth": "1990-01-01",
+        "gender": "Жіноча",
+        "phone": "507778899",
+        "city": "Львів",
+        "street": "Зелена",
+        "house_number": "20",
     }
+    resp = requests.put(url, json=data)
+    print_response(f"UPDATE patient id={patient_id}", resp)
 
-    resp = requests.put(url, json=data, auth=AUTH)
-    print_response(resp)
 
-
-# 5. DELETE
-def delete_client(client_id):
-    print(f"\n--- 5. ВИДАЛЕННЯ (DELETE ID={client_id}) ---")
-    url = f"{BASE_URL}{API_PREFIX}/clients/{client_id}/"
-    resp = requests.delete(url, auth=AUTH)
-
-    print(f"Status: {resp.status_code}")
-    if resp.status_code == 204:
-        print("Успішно видалено!")
-    else:
-        print("Щось пішло не так при видаленні")
-    print("-" * 40)
+def delete_patient(patient_id: int):
+    url = f"{BASE_URL}/patients/{patient_id}/"
+    resp = requests.delete(url)
+    print_response(f"DELETE patient id={patient_id}", resp)
 
 
 if __name__ == "__main__":
-    get_clients_list()
-    new_id = create_client()
+    # 1. список до змін
+    get_patients_list()
+
+    # 2. створити пацієнта
+    new_id = create_patient()
 
     if new_id:
-        get_client_by_id(new_id)
-        update_client(new_id)
-        delete_client(new_id)
-        get_clients_list()
-    else:
-        print("Не вдалося створити клієнта, зупиняємо тест.")
+        # 3. отримати по id
+        get_patient_by_id(new_id)
+
+        # 4. оновити
+        update_patient(new_id)
+
+        # 5. видалити
+        delete_patient(new_id)
+
+    # 6. список після всіх операцій
+    get_patients_list()
