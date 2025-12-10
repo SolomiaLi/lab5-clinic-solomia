@@ -1,6 +1,6 @@
 import requests
 
-BASE_URL = "http://127.0.0.1:8000/api"   # твій сервер
+BASE_URL = "http://127.0.0.1:8000/api"
 
 
 def print_response(title, resp):
@@ -70,21 +70,15 @@ def delete_patient(patient_id: int):
 
 
 if __name__ == "__main__":
-    # 1. список до змін
     get_patients_list()
 
-    # 2. створити пацієнта
     new_id = create_patient()
 
     if new_id:
-        # 3. отримати по id
         get_patient_by_id(new_id)
 
-        # 4. оновити
         update_patient(new_id)
 
-        # 5. видалити
         delete_patient(new_id)
 
-    # 6. список після всіх операцій
     get_patients_list()

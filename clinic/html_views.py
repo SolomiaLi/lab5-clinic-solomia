@@ -7,14 +7,14 @@ from .repository_wrapper import get_repos, commit, rollback
 def patient_list(request):
     repos = get_repos()
     patients = repos.patients.all()
-    return render(request, 'patients_list.html', {'patients': patients})
+    return render(request, 'clinic/patients/patients_list.html', {'patients': patients})
 
 def patient_detail(request, pk):
     repos = get_repos()
     patient = repos.patients.get_by_id(pk)
     if not patient:
         return render(request, '404.html', status=404)
-    return render(request, 'patient_detail.html', {'patient': patient})
+    return render(request, 'clinic/patients/patient_detail.html', {'patient': patient})
 
 def patient_create(request):
     if request.method == 'POST':
@@ -23,7 +23,7 @@ def patient_create(request):
             repos.patients.create(
                 first_name=request.POST.get('first_name'),
                 last_name=request.POST.get('last_name'),
-                date_of_birth=request.POST.get('date_of_birth'), # замість age
+                date_of_birth=request.POST.get('date_of_birth'),
                 gender=request.POST.get('gender'),
                 phone=request.POST.get('phone'),
                 city=request.POST.get('city'),
@@ -31,18 +31,17 @@ def patient_create(request):
                 house_number=request.POST.get('house_number')
             )
             commit()
-            return redirect('patient-list')
+            return redirect('patients-list')
         except Exception as e:
             rollback()
-            return render(request, 'patient_form.html', {'error': str(e)})
-    return render(request, 'patient_form.html')
+            return render(request, 'clinic/patients/patient_form.html', {'error': str(e)})
+    return render(request, 'clinic/patients/patient_form.html')
 
 def patient_edit(request, pk):
     repos = get_repos()
     patient = repos.patients.get_by_id(pk)
     if request.method == 'POST':
         try:
-            # ВИПРАВЛЕНО: Список полів для оновлення
             data = {
                 'first_name': request.POST.get('first_name'),
                 'last_name': request.POST.get('last_name'),
@@ -53,7 +52,6 @@ def patient_edit(request, pk):
                 'street': request.POST.get('street'),
                 'house_number': request.POST.get('house_number'),
             }
-            # Оновлення через SQL (бо ORM немає методу update на об'єкті)
             with repos.conn.cursor() as cur:
                 cols = ", ".join(f"{k} = %s" for k in data.keys())
                 values = tuple(data.values()) + (pk,)
@@ -62,50 +60,48 @@ def patient_edit(request, pk):
             return redirect('patient-detail', pk=pk)
         except Exception as e:
             rollback()
-            return render(request, 'patient_form.html', {'patient': patient, 'error': str(e)})
-    return render(request, 'patient_form.html', {'patient': patient})
+            return render(request, 'clinic/patients/patient_form.html', {'patient': patient, 'error': str(e)})
+    return render(request, 'clinic/patients/patient_form.html', {'patient': patient})
 
 def patient_delete(request, pk):
     repos = get_repos()
     try:
         repos.patients.delete(pk)
         commit()
-        return redirect('patient-list')
+        return redirect('patients-list')
     except Exception as e:
         rollback()
-        # Якщо помилка, повертаємося на деталі
         patient = repos.patients.get_by_id(pk)
-        return render(request, 'patient_detail.html', {'patient': patient, 'error': str(e)})
+        return render(request, 'clinic/patients/patient_detail.html', {'patient': patient, 'error': str(e)})
 
 # -------------------- DOCTOR --------------------
 def doctor_list(request):
     repos = get_repos()
     doctors = repos.doctors.all()
-    return render(request, 'doctors_list.html', {'doctors': doctors})
+    return render(request, 'clinic/doctors/doctors_list.html', {'doctors': doctors})
 
 def doctor_detail(request, pk):
     repos = get_repos()
     doctor = repos.doctors.get_by_id(pk)
     if not doctor:
         return render(request, '404.html', status=404)
-    return render(request, 'doctor_detail.html', {'doctor': doctor})
+    return render(request, 'clinic/doctors/doctor_detail.html', {'doctor': doctor})
 
 def doctor_create(request):
     if request.method == 'POST':
         repos = get_repos()
         try:
-            # ВИПРАВЛЕНО: Використовуємо phone_number замість specialty
             repos.doctors.create(
                 first_name=request.POST.get('first_name'),
                 last_name=request.POST.get('last_name'),
-                phone_number=request.POST.get('phone_number') 
+                phone_number=request.POST.get('phone_number')
             )
             commit()
-            return redirect('doctor-list')
+            return redirect('doctors-list')
         except Exception as e:
             rollback()
-            return render(request, 'doctor_form.html', {'error': str(e)})
-    return render(request, 'doctor_form.html')
+            return render(request, 'clinic/doctors/doctor_form.html', {'error': str(e)})
+    return render(request, 'clinic/doctors/doctor_form.html')
 
 def doctor_edit(request, pk):
     repos = get_repos()
@@ -125,32 +121,32 @@ def doctor_edit(request, pk):
             return redirect('doctor-detail', pk=pk)
         except Exception as e:
             rollback()
-            return render(request, 'doctor_form.html', {'doctor': doctor, 'error': str(e)})
-    return render(request, 'doctor_form.html', {'doctor': doctor})
+            return render(request, 'clinic/doctors/doctor_form.html', {'doctor': doctor, 'error': str(e)})
+    return render(request, 'clinic/doctors/doctor_form.html', {'doctor': doctor})
 
 def doctor_delete(request, pk):
     repos = get_repos()
     try:
         repos.doctors.delete(pk)
         commit()
-        return redirect('doctor-list')
+        return redirect('doctors-list')
     except Exception as e:
         rollback()
         doctor = repos.doctors.get_by_id(pk)
-        return render(request, 'doctor_detail.html', {'doctor': doctor, 'error': str(e)})
+        return render(request, 'clinic/doctors/doctor_detail.html', {'doctor': doctor, 'error': str(e)})
 
 # -------------------- MEDICAL RECORD --------------------
 def record_list(request):
     repos = get_repos()
     records = repos.records.all()
-    return render(request, 'medical_records_list.html', {'records': records})
+    return render(request, 'clinic/medical_records/medical_records_list.html', {'records': records})
 
 def record_detail(request, pk):
     repos = get_repos()
     record = repos.records.get_by_id(pk)
     if not record:
         return render(request, '404.html', status=404)
-    return render(request, 'medical_record_detail.html', {'record': record})
+    return render(request, 'clinic/medical_records/medical_record_detail.html', {'record': record})
 
 def record_create(request):
     if request.method == 'POST':
@@ -161,15 +157,14 @@ def record_create(request):
                 ID_disease=request.POST.get('ID_disease'),
                 lab_test=request.POST.get('lab_test'),
                 level_of_disease=request.POST.get('level_of_disease'),
-                # Перевірка чекбокса: якщо є в POST - 1, інакше 0
                 chronic=1 if 'chronic' in request.POST else 0
             )
             commit()
-            return redirect('record-list')
+            return redirect('medical-records-list')
         except Exception as e:
             rollback()
-            return render(request, 'medical_record_form.html', {'error': str(e)})
-    return render(request, 'medical_record_form.html')
+            return render(request, 'clinic/medical_records/medical_record_form.html', {'error': str(e)})
+    return render(request, 'clinic/medical_records/medical_record_form.html')
 
 def record_edit(request, pk):
     repos = get_repos()
@@ -188,19 +183,19 @@ def record_edit(request, pk):
                 values = tuple(data.values()) + (pk,)
                 cur.execute(f"UPDATE medical_records SET {cols} WHERE id = %s", values)
             commit()
-            return redirect('record-detail', pk=pk)
+            return redirect('medical-record-detail', pk=pk)
         except Exception as e:
             rollback()
-            return render(request, 'medical_record_form.html', {'record': record, 'error': str(e)})
-    return render(request, 'medical_record_form.html', {'record': record})
+            return render(request, 'clinic/medical_records/medical_record_form.html', {'record': record, 'error': str(e)})
+    return render(request, 'clinic/medical_records/medical_record_form.html', {'record': record})
 
 def record_delete(request, pk):
     repos = get_repos()
     try:
         repos.records.delete(pk)
         commit()
-        return redirect('record-list')
+        return redirect('medical-records-list')
     except Exception as e:
         rollback()
         record = repos.records.get_by_id(pk)
-        return render(request, 'medical_record_detail.html', {'record': record, 'error': str(e)})
+        return render(request, 'clinic/medical_records/medical_record_detail.html', {'record': record, 'error': str(e)})
